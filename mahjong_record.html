@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026麻雀大賽記錄 🀄💕</title>
+    <style>
+        body { 
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: linear-gradient(135deg, #ffeef8, #e0f7fa, #f3e5f5); 
+            color: #5d4037; 
+            min-height: 100vh;
+        }
+        h1 { text-align: center; color: #ff6f91; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(255,105,180,0.3); margin-bottom: 10px; }
+        h1::after { content: " 🀄✨"; }
+        h2 { color: #ab47bc; font-size: 1.8em; text-align: center; margin: 30px 0 15px; }
+        form { 
+            background: rgba(255,255,255,0.8); 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 20px rgba(255,182,193,0.4); 
+            max-width: 900px; 
+            margin: 0 auto 40px;
+            border: 3px solid #ffbddd;
+        }
+        label { display: block; margin: 15px 0 8px; font-weight: bold; color: #ff4081; font-size: 1.1em; }
+        input { 
+            padding: 12px; 
+            width: 220px; 
+            border-radius: 15px; 
+            border: 2px solid #ff9ed8; 
+            background: #fff0f8; 
+            font-size: 1em;
+        }
+        button { 
+            padding: 15px 30px; 
+            margin: 20px 10px 0 0; 
+            background: linear-gradient(#ff9a9e, #fad0c4); 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 1.2em; 
+            box-shadow: 0 5px 10px rgba(255,154,158,0.4);
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.1); }
+        button.clear { background: linear-gradient(#a8edea, #fed6e3); }
+        table { 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            width: 100%; 
+            margin-top: 20px; 
+            background: rgba(255,255,255,0.9); 
+            border-radius: 15px; 
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(186,104,200,0.3);
+        }
+        th { background: linear-gradient(#ffecd2, #fcb69f); color: #6d4c41; padding: 15px; font-size: 1.1em; }
+        td { padding: 12px; text-align: center; }
+        tr:nth-child(even) { background: #fff5f8; }
+        .win { color: #ff4081; font-weight: bold; font-size: 1.2em; }
+        .loss { color: #78909c; font-weight: bold; }
+        .info { color: #ff77aa; font-size: 0.9em; }
+        details { 
+            margin-bottom: 20px; 
+            background: rgba(255,255,255,0.8); 
+            border-radius: 20px; 
+            box-shadow: 0 6px 15px rgba(171,71,188,0.3); 
+            border: 2px solid #e1bee7;
+        }
+        summary { 
+            padding: 18px; 
+            font-weight: bold; 
+            background: linear-gradient(#667eea, #764ba2); 
+            color: white; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 1.2em;
+        }
+        summary:hover { background: linear-gradient(#764ba2, #667eea); }
+        .history-table th { background: linear-gradient(#ffeaa7, #fab1a0); color: #5d4037; }
+    </style>
+</head>
+<body>
+    <h1>2026麻雀大賽記錄</h1>
+    
+    <form id="gameForm">
+        <label>日期：</label>
+        <input type="date" id="date" required><br>
+        
+        <label>玩家名稱與贏/輸金額🎲</label>
+        <div id="players">
+            <input type="text" placeholder="玩家1名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家2名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家3名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家4名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家5名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家6名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+            <input type="text" placeholder="玩家7名稱" class="name">
+            <input type="number" placeholder="贏/輸金額" class="amount"><br><br>
+        </div>
+        
+        <label>當日抽水百分比（%）：</label>
+        <input type="number" id="rakePercent" value="5" min="0" max="100" step="0.1"> 
+        <span class="info">💸</span><br>
+        
+        <button type="button" onclick="recordGame()">記錄本次遊戲 🎉</button>
+        <button type="button" class="clear" onclick="clearAllRecords()">清除所有記錄 🗑️</button>
+    </form>
+    
+    <h2>累積統計（已扣抽水後淨額）🌟</h2>
+    <table id="statsTable">
+        <thead>
+            <tr>
+                <th>玩家</th>
+                <th>總淨贏/輸金額</th>
+                <th>場次</th>
+                <th>勝場</th>
+                <th>勝率</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    
+    <h2>勝率排名（勝率相同則比總淨額）🏆</h2>
+    <ol id="ranking"></ol>
+
+    <h2>歷史遊戲記錄（點擊展開查看詳情）📜</h2>
+    <div id="history"></div>
+    
+    <script>
+        let playerRecords = JSON.parse(localStorage.getItem('mahjongPlayerRecords')) || {};
+        let gameHistory = JSON.parse(localStorage.getItem('mahjongGameHistory')) || [];
+
+        function recordGame() {
+            const date = document.getElementById('date').value;
+            if (!date) return alert('請選擇日期哦～📅');
+
+            const names = document.querySelectorAll('.name');
+            const amounts = document.querySelectorAll('.amount');
+            const rakePercent = parseFloat(document.getElementById('rakePercent').value) || 0;
+
+            if (rakePercent < 0 || rakePercent > 100) return alert('抽水百分比請輸入 0~100 啦～');
+
+            let playersThisGame = [];
+            let totalPot = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const name = names[i].value.trim();
+                const amount = parseFloat(amounts[i].value) || 0;
+                if (name && amount !== 0) {
+                    if (!playerRecords[name]) {
+                        playerRecords[name] = { total: 0, games: 0, wins: 0 };
+                    }
+                    playersThisGame.push({ name, rawAmount: amount });
+                    if (amount > 0) totalPot += amount;
+                }
+            }
+
+            if (playersThisGame.length === 0) return alert('請至少輸入一名玩家呀～🀄');
+
+            const multiplier = (100 - rakePercent) / 100;
+            let totalRake = 0;
+            let thisGameDetails = { date, rakePercent, totalPot, players: [] };
+
+            playersThisGame.forEach(player => {
+                const netAmount = Math.round(player.rawAmount * multiplier);
+                const rakeThisPlayer = player.rawAmount - netAmount;
+                totalRake += rakeThisPlayer;
+
+                thisGameDetails.players.push({
+                    name: player.name,
+                    rawAmount: player.rawAmount,
+                    netAmount: netAmount,
+                    rake: rakeThisPlayer
+                });
+
+                playerRecords[player.name].total += netAmount;
+                playerRecords[player.name].games++;
+                if (netAmount > 0) playerRecords[player.name].wins++;
+            });
+
+            thisGameDetails.totalRake = totalRake;
+            gameHistory.unshift(thisGameDetails);
+            localStorage.setItem('mahjongPlayerRecords', JSON.stringify(playerRecords));
+            localStorage.setItem('mahjongGameHistory', JSON.stringify(gameHistory));
+
+            updateStats();
+            updateHistory();
+            alert(`記錄成功啦！🎉\n${date} 抽水 ${rakePercent}%，總抽水金額 ${totalRake}`);
+        }
+
+        function updateStats() {
+            const tbody = document.querySelector('#statsTable tbody');
+            const ranking = document.getElementById('ranking');
+            tbody.innerHTML = '';
+            ranking.innerHTML = '';
+
+            let players = Object.entries(playerRecords).map(([name, data]) => {
+                const winRate = data.games > 0 ? (data.wins / data.games * 100).toFixed(2) : 0;
+                return { name, ...data, winRate: parseFloat(winRate) };
+            });
+
+            players.sort((a, b) => b.total - a.total);
+            players.forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${player.name}</strong></td>
+                    <td class="${player.total > 0 ? 'win' : player.total < 0 ? 'loss' : ''}">${player.total.toFixed(0)}</td>
+                    <td>${player.games}</td>
+                    <td>${player.wins}</td>
+                    <td>${player.winRate}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            players.sort((a, b) => b.winRate - a.winRate || b.total - a.total);
+            players.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong style="font-size:1.3em; color:#ff4081;">${index + 1}. ${player.name}</strong> — 勝率 ${player.winRate}% （總淨額 ${player.total.toFixed(0)}）`;
+                ranking.appendChild(li);
+            });
+
+            if (players.length === 0) {
+                ranking.innerHTML = '<p style="text-align:center; color:#ff77aa;">尚無記錄哦～快來記一場吧！💕</p>';
+            }
+        }
+
+        function updateHistory() {
+            const container = document.getElementById('history');
+            container.innerHTML = '';
+
+            if (gameHistory.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#ab47bc;">尚無歷史記錄呢～</p>';
+                return;
+            }
+
+            gameHistory.forEach((game) => {
+                const details = document.createElement('details');
+                const summary = document.createElement('summary');
+                summary.textContent = `${game.date}　抽水 ${game.rakePercent}%　總鍋底 ${game.totalPot}　抽水金額 ${game.totalRake} 💖`;
+                details.appendChild(summary);
+
+                const table = document.createElement('table');
+                table.className = 'history-table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>玩家</th>
+                            <th>原始金額</th>
+                            <th>扣除金額</th>
+                            <th>淨額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${game.players.map(p => `
+                            <tr>
+                                <td><strong>${p.name}</strong></td>
+                                <td class="${p.rawAmount > 0 ? 'win' : 'loss'}">${p.rawAmount}</td>
+                                <td>${p.rake}</td>
+                                <td class="${p.netAmount > 0 ? 'win' : p.netAmount < 0 ? 'loss' : ''}">${p.netAmount}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                `;
+                details.appendChild(table);
+                container.appendChild(details);
+            });
+        }
+
+        function clearAllRecords() {
+            if (confirm('真的要清除所有記錄嗎？🥺 此動作無法復原哦！')) {
+                localStorage.removeItem('mahjongPlayerRecords');
+                localStorage.removeItem('mahjongGameHistory');
+                playerRecords = {};
+                gameHistory = [];
+                updateStats();
+                updateHistory();
+                alert('所有記錄已清除～下次再來玩吧！👋');
+            }
+        }
+
+        updateStats();
+        updateHistory();
+    </script>
+</body>
+</html>
